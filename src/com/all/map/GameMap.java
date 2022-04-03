@@ -4,9 +4,12 @@ import com.all.Game.GameFrame;
 import com.all.Util.Constant;
 import com.all.Util.MapTilePool;
 import com.all.tank.Tank;
+
 import java.awt.*;
+import java.io.FileInputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 
 /**
  * 游戏地图类
@@ -30,7 +33,7 @@ public class GameMap {
     private TankHouse house;
 
     public GameMap() {
-        initMap();
+        initMap(1);
     }
 
     public List<MapTile> getTiles() {
@@ -42,34 +45,66 @@ public class GameMap {
     }
 
     /**
-     * 初始化地图元素快
+     * 初始化地图元素快 level 表示具体第几关
      */
-    private void initMap() {
+    private void initMap(int level) {
 
-       /* final int COUNT = 30;
-        for (int i = 0; i < COUNT; i++) {
-            MapTile tile = MapTilePool.get();
-
-            int x = MyUtil.getRandomNumber(MAP_X, MAP_X + MAP_WIDTH - MapTile.tileW);
-            int y = MyUtil.getRandomNumber(MAP_Y, MAP_Y + MAP_HEIGHT - MapTile.tileW);
-            //新生成的块和已经存在的块有重叠
-            if (isCollide(tiles, x, y)) {
-                i--;
-                continue;
-            }
-            tile.setX(x);
-            tile.setY(y);
-            tiles.add(tile);
-        }*/
-
-        //三行的地图
-        addRow(MAP_X,MAP_X+MAP_WIDTH,MAP_Y,MapTile.TYPE_NORMAL,0);
-        addRow(MAP_X,MAP_X+MAP_WIDTH,MAP_Y+MapTile.tileW*2,MapTile.TYPE_COVER,0);
-        addRow(MAP_X,MAP_X+MAP_WIDTH,MAP_Y+MapTile.tileW*4,MapTile.TYPE_HARD,MapTile.tileW+MapTile.tileW/2);
+        try {
+            loadLevel(level);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
         //初始化大本营
         house = new TankHouse();
         addHouse();
+    }
+
+    /**
+     * 加载关卡信息
+     * @param level
+     * @throws Exception
+     */
+    private void loadLevel(int level) throws Exception {
+        Properties prop = new Properties();
+        prop.load(new FileInputStream("level/lv_" + level));
+        //将所有的地图信息加载进来
+        int enemyCount = Integer.parseInt(prop.getProperty("enemyCount"));
+        String methodName = prop.getProperty("method");
+        int invokeCount = Integer.parseInt(prop.getProperty("invokeCount"));
+        String[] params = new String[invokeCount];
+        for (int i = 1; i <= invokeCount; i++) {
+            params[i - 1] = prop.getProperty("param" + i);
+        }
+        invokeMethod(methodName, params);
+    }
+
+    private void invokeMethod(String name, String[] params) {
+        for (String param : params) {
+            String[] split = param.split(",");
+            int[] arr = new int[split.length];
+            int i;
+            for ( i = 0; i < split.length-1; i++) {
+                arr[i] = Integer.parseInt(split[i]);
+            }
+            final int DIS = MapTile.tileW;
+            int dis = (int)(Double.parseDouble(split[i])*DIS);
+            switch (name) {
+                case "addRow":
+                    addRow(MAP_X + arr[0] * DIS, MAP_X + MAP_WIDTH - arr[1] * DIS,
+                            MAP_Y + arr[2] * DIS, arr[3], dis);
+                    break;
+                case "addCol":
+                    addCol(MAP_Y+arr[0]*DIS,MAP_Y+MAP_HEIGHT-arr[1]*DIS,
+                            MAP_X + arr[2]*DIS,arr[3],dis);
+                    break;
+                case "addRect":
+                    addRect(MAP_X+arr[0]*DIS,MAP_X+MAP_WIDTH-arr[1]*DIS,
+                            MAP_Y+arr[2]*DIS,MAP_Y+MAP_HEIGHT-arr[3]*DIS,
+                            arr[4],dis);
+                    break;
+            }
+        }
     }
 
     /**
@@ -81,24 +116,28 @@ public class GameMap {
 
     /**
      * 只对没有遮挡效果的块进行绘制
+     *
      * @param g
      */
     public void drawBK(Graphics g) {
         for (MapTile tile : tiles) {
-            if(tile.getType()!= MapTile.TYPE_COVER){
-            tile.draw(g);}
+            if (tile.getType() != MapTile.TYPE_COVER) {
+                tile.draw(g);
+            }
         }
         house.draw(g);
     }
 
     /**
      * 只绘制有遮挡效果的块
+     *
      * @param g
      */
     public void drawCover(Graphics g) {
         for (MapTile tile : tiles) {
-            if(tile.getType() == MapTile.TYPE_COVER){
-                tile.draw(g);}
+            if (tile.getType() == MapTile.TYPE_COVER) {
+                tile.draw(g);
+            }
         }
         house.draw(g);
     }
@@ -146,13 +185,52 @@ public class GameMap {
      */
     public void addRow(int startX, int endX, int startY, int type, final int DIS) {
         int count = 0;
-        count = (endX - startX) / (MapTile.tileW+DIS);
+        count = (endX - startX) / (MapTile.tileW + DIS);
         for (int i = 0; i < count; i++) {
             MapTile tile = MapTilePool.get();
             tile.setType(type);
-            tile.setX(startX + i * (MapTile.tileW+DIS));
+            tile.setX(startX + i * (MapTile.tileW + DIS));
             tile.setY(startY);
             tiles.add(tile);
+        }
+    }
+
+    /**
+     * 往地图容器中添加一列指定类型的地图快
+     *
+     * @param startY 该列的起始y坐标
+     * @param endY   结束y坐标
+     * @param X      x坐标
+     * @param type   元素类型
+     * @param DIS    相邻块的间隔
+     */
+    public void addCol(int startY, int endY, int X, int type, final int DIS) {
+        int count = 0;
+        count = (endY - startY) / (MapTile.tileW + DIS);
+        for (int i = 0; i < count; i++) {
+            MapTile tile = MapTilePool.get();
+            tile.setType(type);
+            tile.setX(X);
+            tile.setY(startY + i * (MapTile.tileW + DIS));
+            tiles.add(tile);
+        }
+    }
+
+    /**
+     * 对指定的矩形区域添加元素
+     *
+     * @param startX
+     * @param endX
+     * @param startY
+     * @param endY
+     * @param type
+     * @param DIS
+     */
+    public void addRect(int startX, int endX, int startY, int endY, int type, final int DIS) {
+        //添加若干行或者若干列即可
+        int rows = (endY - startY) / (MapTile.tileW + DIS);
+        for (int i = 0; i < rows; i++) {
+            addRow(startX, endX, startY + i * (DIS + MapTile.tileW), type, DIS);
         }
     }
 }

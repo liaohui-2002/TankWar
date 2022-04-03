@@ -380,10 +380,11 @@ public class GameFrame extends Frame implements Runnable {
      * 开始新游戏的方法
      */
     private void newGame() {
+        gameMap = new GameMap();
         gameState = STATE_RUN;
         //创建坦克对象，敌人的坦克
         myTank = new MyTank(FRAME_WIDTH/3, FRAME_HEIGHT-Tank.RADIUS, Tank.DIR_UP);
-        gameMap = new GameMap();
+
         //使用一个单独的线程用于生成敌人的坦克
         new Thread() {
             @Override
