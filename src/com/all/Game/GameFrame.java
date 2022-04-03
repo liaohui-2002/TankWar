@@ -434,7 +434,6 @@ public class GameFrame extends Frame implements Runnable {
             myTank.collideBullets(enemy.getBullets());
         }
     }
-
     //和地图块的碰撞
     private void bulletAngTankCollideMapTile(){
         myTank.bulletCollideMapTile(gameMap.getTiles());
@@ -454,9 +453,7 @@ public class GameFrame extends Frame implements Runnable {
         }
         //将所有不可见的地图块移除
         gameMap.clearDestroyedTile();
-
     }
-
     //所有坦克上的爆炸效果
     private void drawExplodes(Graphics g) {
         for (Tank enemy : enemies) {
@@ -464,12 +461,10 @@ public class GameFrame extends Frame implements Runnable {
         }
         myTank.drawExplodes(g);
     }
-
     //获得游戏状态
     public static void setGameState(int gameState) {
         GameFrame.gameState = gameState;
     }
-
     //修改游戏状态
     public static int getGameState() {
         return gameState;
