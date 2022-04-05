@@ -1,11 +1,11 @@
 package com.all.Game;
 
+import com.all.Util.MusicUtil;
 import com.all.Util.MyUtil;
 import com.all.map.GameMap;
 import com.all.tank.EnemyTank;
 import com.all.tank.MyTank;
 import com.all.tank.Tank;
-
 import java.awt.*;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
@@ -41,6 +41,9 @@ public class GameFrame extends Frame implements Runnable {
 
     //敌人的坦克容器
     private List<Tank> enemies = new ArrayList<>();
+
+    //用来记录产生了本关卡产生了多少个敌人
+    private int bornEnemyCount;
 
     //定义地图相关内容
     private  GameMap gameMap;
@@ -380,6 +383,8 @@ public class GameFrame extends Frame implements Runnable {
      * 开始新游戏的方法
      */
     private void newGame() {
+        MusicUtil.playStart();
+        bornEnemyCount = 0;
         gameMap = new GameMap();
         gameState = STATE_RUN;
         //创建坦克对象，敌人的坦克
@@ -390,9 +395,12 @@ public class GameFrame extends Frame implements Runnable {
             @Override
             public void run() {
                 while (true) {
-                    if (enemies.size() < ENEMY_MAX_COUNT) {
+                    if (LevelInfo.getInstance().getEnemyCount()>bornEnemyCount&&
+                            enemies.size() < ENEMY_MAX_COUNT) {
                         Tank enemy = EnemyTank.createEnemy();
                         enemies.add(enemy);
+                        bornEnemyCount++;
+
                     }
                     try {
                         Thread.sleep(ENEMY_BORN_INTERVAL);

@@ -1,6 +1,7 @@
 package com.all.tank;
 
 import com.all.Game.GameFrame;
+import com.all.Game.LevelInfo;
 import com.all.Util.Constant;
 import com.all.Util.MyUtil;
 import com.all.Util.EnemyTanksPool;
@@ -69,13 +70,16 @@ public class EnemyTank extends Tank{
         int x = MyUtil.getRandomNumber(0, 2) == 0 ? RADIUS : Constant.FRAME_WIDTH - 2*RADIUS;
         int y = GameFrame.titleBarH + RADIUS;
         int dir = DIR_DOWN;
-        Tank enemy = EnemyTanksPool.get();
+        EnemyTank enemy = (EnemyTank)EnemyTanksPool.get();
         enemy.setX(x);
         enemy.setY(y);
         enemy.setDir(dir);
         enemy.setEnemy(true);
         enemy.setState(STATE_MOVE);
         enemy.setHp(Tank.DEFAULT_HP);
+        //通过关卡中信息中的敌人信息设置敌人类型
+        int enemyType = LevelInfo.getInstance().getRandomEnemyType();
+        enemy.setType(enemyType);
         return enemy;
     }
 

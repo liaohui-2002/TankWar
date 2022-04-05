@@ -313,6 +313,8 @@ public abstract class Tank {
             bullets.add(bullet);
             //发射子弹后记录发射时间
             fireTime = System.currentTimeMillis();
+            //开火音乐
+            MusicUtil.playFire();
         }
 //        System.out.println("发射一颗子弹，子弹数目："+(BulletsPool.DEFAULT_POOL_SIZE-bullets.size()));
     }
@@ -373,7 +375,7 @@ public abstract class Tank {
         explode.setX(x);
         explode.setY(y);
         explode.setVisible(true);
-
+        MusicUtil.playBomb();
         explodes.add(explode);
 
     }

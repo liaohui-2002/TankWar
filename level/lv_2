@@ -1,6 +1,6 @@
 #第二关的关卡信息
 #敌人数量
-enemyCount=50
+enemyCount=5
 #敌人坦克类型 多个类型使用逗号分割
 enemyType=0,1
 #用哪个方法

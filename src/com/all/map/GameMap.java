@@ -1,6 +1,7 @@
 package com.all.map;
 
 import com.all.Game.GameFrame;
+import com.all.Game.LevelInfo;
 import com.all.Util.Constant;
 import com.all.Util.MapTilePool;
 import com.all.tank.Tank;
@@ -66,10 +67,23 @@ public class GameMap {
      * @throws Exception
      */
     private void loadLevel(int level) throws Exception {
+        //获得关卡信息类的唯一实例对象
+        LevelInfo levelInfo = LevelInfo.getInstance();
+        //设置关卡编号
+        levelInfo.setLevel(level);
         Properties prop = new Properties();
         prop.load(new FileInputStream("level/lv_" + level));
-        //将所有的地图信息加载进来
+        //设置敌人数量
         int enemyCount = Integer.parseInt(prop.getProperty("enemyCount"));
+        levelInfo.setEnemyCount(enemyCount);
+        String[] enemyType = prop.getProperty("enemyType").split(",");
+        //0，1 对敌人类型解析
+        int[] type = new int[enemyType.length];
+        for (int i = 0; i < type.length; i++) {
+            type[i] = Integer.parseInt(enemyType[i]);
+        }
+        //设置敌人类型
+        levelInfo.setEnemyType(type);
         String methodName = prop.getProperty("method");
         int invokeCount = Integer.parseInt(prop.getProperty("invokeCount"));
         String[] params = new String[invokeCount];
