@@ -34,7 +34,6 @@ public class GameMap {
     private TankHouse house;
 
     public GameMap() {
-        initMap(1);
     }
 
     public List<MapTile> getTiles() {
@@ -48,8 +47,8 @@ public class GameMap {
     /**
      * 初始化地图元素快 level 表示具体第几关
      */
-    private void initMap(int level) {
-
+    public void initMap(int level) {
+        tiles.clear();
         try {
             loadLevel(level);
         } catch (Exception e) {
@@ -84,6 +83,10 @@ public class GameMap {
         }
         //设置敌人类型
         levelInfo.setEnemyType(type);
+        //关卡难度
+        String levelType =  prop.getProperty("levelType");
+        levelInfo.setLevelType(Integer.parseInt(levelType == null?"1":levelType));
+
         String methodName = prop.getProperty("method");
         int invokeCount = Integer.parseInt(prop.getProperty("invokeCount"));
         String[] params = new String[invokeCount];

@@ -1,6 +1,6 @@
 #第一关的关卡信息
 #敌人数量
-enemyCount=5
+enemyCount=2
 #敌人坦克类型 多个类型使用逗号分割
 enemyType=0,1
 #用哪个方法
@@ -8,7 +8,7 @@ method=addRow
 //该方法调用几次
 invokeCount=5
 #关卡难度
-levelType=2
+levelType=1
 #参数 int startX, int endX, int startY, int type, final int DIS
 #0，从地图左上角开始 0代表边界 大于0的值都是地图元素块的宽度的倍数
 param1=0,0,0,0,0

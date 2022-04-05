@@ -23,7 +23,7 @@ public abstract class Tank {
     public static final int DIR_LEFT = 2;
     public static final int DIR_RIGHT = 3;
     //半径
-    public static final int RADIUS =30;
+    public static final int RADIUS = 30;
     //默认速度 ,每帧跑4像素
     public static final int DEFAULT_SPEED = 4;
 
@@ -33,14 +33,15 @@ public abstract class Tank {
     public static final int STATE_DIE = 2;
 
     //坦克的生命值
-    public static final int DEFAULT_HP = 1000;
+    public static final int DEFAULT_HP = 100;
+    private int maxHp = DEFAULT_HP;
 
     private int x, y;
 
     private int hp = DEFAULT_HP;//血量
     private int atk;//攻击力
-    public static final int ATK_MAX = 100;
-    public static final int ATK_MIN = 50;
+    public static final int ATK_MAX = 25;
+    public static final int ATK_MIN = 15;
     private int speed = DEFAULT_SPEED;
     private int dir;
     private int state = STATE_STAND;
@@ -57,12 +58,13 @@ public abstract class Tank {
     private Color color;
     private boolean isEnemy = false;
 
-    private BloodBar bar =new BloodBar();
+    private BloodBar bar = new BloodBar();
     // 炮弹
     private List<Bullet> bullets = new ArrayList();
 
     //使用容器保存当前坦克身上的爆炸效果
     private List<Explode> explodes = new ArrayList<>();
+
     public Tank(int x, int y, int dir) {
         this.x = x;
         this.y = y;
@@ -70,13 +72,14 @@ public abstract class Tank {
 
         initTank();
     }
+
     public Tank() {
-       initTank();
+        initTank();
     }
 
-    public void initTank(){
+    public void initTank() {
         color = MyUtil.getRandomColor();
-        atk = MyUtil.getRandomNumber(ATK_MIN,ATK_MAX);
+        atk = MyUtil.getRandomNumber(ATK_MIN, ATK_MAX);
     }
 
 
@@ -98,7 +101,7 @@ public abstract class Tank {
      *
      * @param g
      */
-    public  abstract void drawImgTank(Graphics g);
+    public abstract void drawImgTank(Graphics g);
    /* {
         if (isEnemy) {
             g.drawImage(enemyImg[dir], x - RADIUS, y - RADIUS, null);
@@ -159,7 +162,8 @@ public abstract class Tank {
     }
 
     //坦克的移动功能
-    private int oldX= -1,oldY= -1;
+    private int oldX = -1, oldY = -1;
+
     private void move() {
         oldX = x;
         oldY = y;
@@ -272,13 +276,14 @@ public abstract class Tank {
     private long fireTime;
     //子弹发射最小时候间隔 0.5s
     public static final int FIRE_INTERVAL = 300;
+
     /**
      * 坦克开火
      * 创建了一个子弹对象属性信息，子弹对象的属性信息通过坦克的信息获得
      * 然后将创建的子弹添加到坦克的弹夹
      */
     public void fire() {
-        if(System.currentTimeMillis() - fireTime>FIRE_INTERVAL) {
+        if (System.currentTimeMillis() - fireTime > FIRE_INTERVAL) {
             int bulletX = x;
             int bulletY = y;
             switch (dir) {
@@ -345,7 +350,7 @@ public abstract class Tank {
     /**
      * 坦克销毁时候处理坦克所有子弹
      */
-    public void bulletsReturn(){
+    public void bulletsReturn() {
         for (Bullet bullet : bullets) {
             BulletsPool.theReturn(bullet);
         }
@@ -353,24 +358,25 @@ public abstract class Tank {
     }
 
     //坦克和子弹碰撞的方法
-    public void collideBullets(List<Bullet> bullets){
+    public void collideBullets(List<Bullet> bullets) {
         //遍历所有的子弹，依次和当前坦克进行碰撞检测
         for (Bullet bullet : bullets) {
             int bulletX = bullet.getX();
             int bulletY = bullet.getY();
             //子弹和坦克撞上了
-            if(MyUtil.isCollide(x,y,RADIUS,bulletX,bulletY)){
+            if (MyUtil.isCollide(x, y, RADIUS, bulletX, bulletY)) {
                 //子弹消失
                 bullet.setVisible(false);
                 //坦克受伤
                 hurt(bullet);
                 //添加爆炸效果
-                addExplode(bulletX,bulletY);
+                addExplode(bulletX, bulletY);
             }
         }
     }
+
     //添加爆炸效果
-    private void addExplode(int x,int y){
+    private void addExplode(int x, int y) {
         Explode explode = ExplodesPool.get();
         explode.setX(x);
         explode.setY(y);
@@ -379,11 +385,12 @@ public abstract class Tank {
         explodes.add(explode);
 
     }
+
     //坦克受到伤害
-    private void hurt(Bullet bullet){
+    private void hurt(Bullet bullet) {
         int atk = bullet.getAtk();
         hp -= atk;
-        if(hp< 0){
+        if (hp < 0) {
             hp = 0;
             die();
         }
@@ -391,37 +398,53 @@ public abstract class Tank {
 
 
     //坦克死亡 TODO
-    private void die(){
-        if(isEnemy){
+    private void die() {
+        if (isEnemy) {
+            GameFrame.killEnemyCount++;
             //敌人坦克被消灭 还回对象池
             EnemyTanksPool.theReturn(this);
-        }
-        else {
+            //判断是否通过本关
+            if (GameFrame.isCrossLevel()) {
+                //判断是否通关
+                if (GameFrame.isLastLevel()) {
+                    //通关
+                    GameFrame.setGameState(Constant.STATE_WIN);
+                } else {
+                    //TODO 进入下一关
+                    GameFrame.startCrossLevel();
+//                   GameFrame.nextLevel();
+                }
+            }
+
+        } else {
             delaySecondsToOver(1000);
             //game over
-            GameFrame.setGameState(Constant.STATE_OVER);
+            GameFrame.setGameState(Constant.STATE_LOST);
 
         }
     }
 
     /**
      * 判断当前坦克是否死亡
+     *
      * @return
      */
-    public boolean isDie(){
-        return hp <=0;
+    public boolean isDie() {
+        return hp <= 0;
     }
+
     /**
      * 绘制当前坦克上的所有的爆炸效果
+     *
      * @param g
      */
-    public void drawExplodes(Graphics g){
+    public void drawExplodes(Graphics g) {
         for (Explode explode : explodes) {
             explode.draw(g);
         }
         //将不可见的爆炸效果删除 还回对象池
-        for (int i = 0; i <explodes.size() ; i++) {
-            if(!explodes.get(i).isVisible()){
+        for (int i = 0; i < explodes.size(); i++) {
+            if (!explodes.get(i).isVisible()) {
                 Explode remove = explodes.remove(i);
                 ExplodesPool.theReturn(remove);
                 i--;
@@ -430,40 +453,43 @@ public abstract class Tank {
     }
 
     //坦克血条
-    class BloodBar{
-        public static final  int BAR_LENGTH = 2*RADIUS;
-        public static final  int BAR_HEIGHT = 5;
+    class BloodBar {
+        public static final int BAR_LENGTH = 2 * RADIUS;
+        public static final int BAR_HEIGHT = 5;
 
-        public void draw(Graphics g){
+        public void draw(Graphics g) {
             //底色
             g.setColor(Color.YELLOW);
-            g.fillRect(x -RADIUS,y-RADIUS-BAR_HEIGHT*2,BAR_LENGTH,BAR_HEIGHT);
-           //红色血量
+            g.fillRect(x - RADIUS, y - RADIUS - BAR_HEIGHT * 2, BAR_LENGTH, BAR_HEIGHT);
+            //红色血量
             g.setColor(Color.red);
-            g.fillRect(x-RADIUS,y-RADIUS-BAR_HEIGHT*2,hp*BAR_LENGTH/DEFAULT_HP,BAR_HEIGHT);
+            g.fillRect(x - RADIUS, y - RADIUS - BAR_HEIGHT * 2, hp * BAR_LENGTH / maxHp, BAR_HEIGHT);
             //蓝色边框
             g.setColor(Color.WHITE);
-            g.drawRect(x -RADIUS,y-RADIUS-BAR_HEIGHT*2,BAR_LENGTH,BAR_HEIGHT);
+            g.drawRect(x - RADIUS, y - RADIUS - BAR_HEIGHT * 2, BAR_LENGTH, BAR_HEIGHT);
         }
     }
+
     //坦克的子弹与地图块的碰撞
-    public void bulletCollideMapTile(List<MapTile> tiles){
-        for (MapTile tile : tiles) {
-            if(tile.isCollideBullet(bullets)){
+    public void bulletCollideMapTile(List<MapTile> tiles) {
+//        for (MapTile tile : tiles) {
+        for (int i = 0; i < tiles.size(); i++) {
+            MapTile tile = tiles.get(i);
+            if (tile.isCollideBullet(bullets)) {
                 //添加爆炸效果
-                addExplode(tile.getX()+MapTile.radius,tile.getY()+MapTile.radius);
+                addExplode(tile.getX() + MapTile.radius, tile.getY() + MapTile.radius);
                 //打到水泥块
-                if(tile.getType() == MapTile.TYPE_HARD)
+                if (tile.getType() == MapTile.TYPE_HARD)
                     continue;
                 //设置地图块销毁 TODO
                 tile.setVisible(false);
 //                tiles.remove(tile);
                 //归还对象池
                 MapTilePool.theReturn(tile);
-
-                if(tile.isHouse()){
+                if (tile.isHouse()) {
                     //当老巢被击毁之后一秒钟切换到游戏结束的画面
                     delaySecondsToOver(1000);
+//                    GameFrame.setGameState(Constant.STATE_LOST);
                 }
             }
         }
@@ -471,10 +497,11 @@ public abstract class Tank {
 
     /**
      * 延迟若干毫秒切换到游戏结束画面
+     *
      * @param millisSecond
      */
-    private void delaySecondsToOver(int millisSecond){
-        new Thread(){
+    private void delaySecondsToOver(int millisSecond) {
+        new Thread() {
             @Override
             public void run() {
                 try {
@@ -482,7 +509,7 @@ public abstract class Tank {
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
-                GameFrame.setGameState(Constant.STATE_OVER);
+                GameFrame.setGameState(Constant.STATE_LOST);
             }
         }.start();
     }
@@ -491,31 +518,34 @@ public abstract class Tank {
      * 一个地图块和当前坦克的碰撞方法
      * 从tile中提取出八个点，只要有一个点与坦克有碰撞，可以判定为发生碰撞
      * 从左上角开始顺时针判断每个点
+     *
      * @param tiles
      * @return
      */
-    public boolean isCollideTile(List<MapTile> tiles){
-        for (MapTile tile : tiles) {
-            if(tile.isVisible()&&tile.getType() == MapTile.TYPE_COVER) continue;
+    public boolean isCollideTile(List<MapTile> tiles) {
+//        for (MapTile tile : tiles) {
+        for (int i = 0; i < tiles.size(); i++) {
+            MapTile tile = tiles.get(i);
+            if (tile.isVisible() && tile.getType() == MapTile.TYPE_COVER) continue;
             int tileX = tile.getX();
             int tileY = tile.getY();
             boolean collide = MyUtil.isCollide(x, y, RADIUS, tileX, tileY);
             //碰上了就直接返回，否则判断下一个点
-            if(collide){
+            if (collide) {
                 return true;
             }
 
             //点2；
             tileX += MapTile.radius;
             collide = MyUtil.isCollide(x, y, RADIUS, tileX, tileY);
-            if(collide){
+            if (collide) {
                 return true;
             }
 
             //点3 右上角点；
             tileX += MapTile.radius;
             collide = MyUtil.isCollide(x, y, RADIUS, tileX, tileY);
-            if(collide){
+            if (collide) {
                 return true;
             }
 
@@ -523,34 +553,34 @@ public abstract class Tank {
 //        tileX += MapTile.radius;
             tileY += MapTile.radius;
             collide = MyUtil.isCollide(x, y, RADIUS, tileX, tileY);
-            if(collide){
+            if (collide) {
                 return true;
             }
 
             //点5 右下；
             tileY += MapTile.radius;
             collide = MyUtil.isCollide(x, y, RADIUS, tileX, tileY);
-            if(collide){
+            if (collide) {
                 return true;
             }
 
             //点6 下中；
             tileX -= MapTile.radius;
             collide = MyUtil.isCollide(x, y, RADIUS, tileX, tileY);
-            if(collide){
+            if (collide) {
                 return true;
             }
 
             //点7 左下；
             tileX -= MapTile.radius;
             collide = MyUtil.isCollide(x, y, RADIUS, tileX, tileY);
-            if(collide){
+            if (collide) {
                 return true;
             }
             //点8  左中点；
             tileY -= MapTile.radius;
             collide = MyUtil.isCollide(x, y, RADIUS, tileX, tileY);
-            if(collide){
+            if (collide) {
                 return true;
             }
         }
@@ -560,7 +590,7 @@ public abstract class Tank {
     /**
      * 坦克回退的方法
      */
-    public void back(){
+    public void back() {
         x = oldX;
         y = oldY;
      /*   switch (dir){
@@ -577,5 +607,13 @@ public abstract class Tank {
                 x-=speed;
                 break;
         }*/
+    }
+
+    public int getMaxHp() {
+        return maxHp;
+    }
+
+    public void setMaxHp(int maxHp) {
+        this.maxHp = maxHp;
     }
 }

@@ -1,11 +1,14 @@
 package com.all.Game;
 
+
 import com.all.Util.MusicUtil;
 import com.all.Util.MyUtil;
 import com.all.map.GameMap;
+import com.all.map.MapTile;
 import com.all.tank.EnemyTank;
 import com.all.tank.MyTank;
 import com.all.tank.Tank;
+
 import java.awt.*;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
@@ -23,7 +26,7 @@ import static com.all.Util.Constant.*;
  * @date 2022/3/27 17:56
  */
 //继承jdk定义好的类 Frame窗口类
-public class GameFrame extends Frame implements Runnable {
+ public class GameFrame extends Frame implements Runnable {
     //    第一次使用的时候加载
     private Image overImg = null;
     //定义一张和屏幕大小一致的图片
@@ -32,22 +35,34 @@ public class GameFrame extends Frame implements Runnable {
     public static int gameState;
 
     //菜单指针
-    private int menuIndex;
+    private static int menuIndex;
     //定义坦克对象
-    private Tank myTank;
+    private static Tank myTank;
 
     //标题栏目的高度
     public static int titleBarH;
 
     //敌人的坦克容器
-    private List<Tank> enemies = new ArrayList<>();
+    private static List<Tank> enemies = new ArrayList<>();
 
     //用来记录产生了本关卡产生了多少个敌人
-    private int bornEnemyCount;
+    private static int bornEnemyCount;
+
+    public static int killEnemyCount;
 
     //定义地图相关内容
-    private  GameMap gameMap;
+    private static GameMap gameMap = new GameMap();;
 
+    //开始过关动画
+    public static int flashTime;
+    public static final int RECT_WIDTH=40;
+    public static final int RECT_COUNT = FRAME_WIDTH/RECT_WIDTH +1;
+    public static boolean isOpen = false;
+    public static void startCrossLevel(){
+        gameState = STATE_CROSS;
+        flashTime = 0;
+        isOpen = false;
+    }
     /*
     游戏主窗口
      */
@@ -57,6 +72,13 @@ public class GameFrame extends Frame implements Runnable {
         initEventListener();
         //启动用于刷新窗口的线程
         new Thread(this).start();
+    }
+
+    /**
+     * 进入下一关的方法
+     */
+    public static void nextLevel() {
+        startGame(LevelInfo.getInstance().getLevel()+1);
     }
 
     /**
@@ -109,8 +131,14 @@ public class GameFrame extends Frame implements Runnable {
             case STATE_RUN:
                 drawRun(g);
                 break;
-            case STATE_OVER:
-                drawOver(g);
+            case STATE_LOST:
+                drawLost(g,"过关失败！");
+                break;
+            case STATE_WIN:
+                drawWin(g);
+                break;
+            case STATE_CROSS:
+                drawCross(g);
                 break;
         }
 
@@ -119,14 +147,44 @@ public class GameFrame extends Frame implements Runnable {
     }
 
     /**
+     * 绘制过关动画
+     * @param g
+     */
+    public void drawCross(Graphics g){
+        gameMap.drawBK(g);
+        myTank.draw(g);
+        gameMap.drawCover(g);
+        g.setColor(Color.BLACK);
+        //关闭百叶窗效果
+        if(!isOpen){
+            for (int i = 0; i < RECT_COUNT; i++) {
+             g.fillRect(i*RECT_WIDTH,0,flashTime,FRAME_HEIGHT);
+            }
+            //所有叶片都关闭了
+            if(flashTime++ - RECT_WIDTH>5){
+                isOpen = true;
+                //初始化下一个地图
+                gameMap.initMap(LevelInfo.getInstance().getLevel()+1);
+            }
+        }
+        else {
+            for (int i = 0; i < RECT_COUNT; i++) {
+                g.fillRect(i*RECT_WIDTH,0,flashTime,FRAME_HEIGHT);
+            }
+            if(flashTime-- == 0){
+                startGame(LevelInfo.getInstance().getLevel());
+            }
+        }
+    }
+    /**
      * 绘制游戏结束的画面
      *
      * @param g
      */
-    private void drawOver(Graphics g) {
+    private void drawLost(Graphics g,String str) {
         //保证只加载一次
         if (overImg == null) {
-            overImg = MyUtil.createImage("res/over.png");
+            overImg = MyUtil.createImage("res/over.gif");
         }
         int width = overImg.getWidth(null);
         int height = overImg.getHeight(null);
@@ -134,10 +192,10 @@ public class GameFrame extends Frame implements Runnable {
         g.drawImage(overImg, FRAME_WIDTH - width >> 1, FRAME_HEIGHT - height >> 1, null);
 
         //添加键位提示信息
-        g.setColor(Color.WHITE);
+        g.setColor(Color.RED);
         g.drawString(OVER_STR0, 30, FRAME_HEIGHT - 40);
         g.drawString(OVER_STR1, FRAME_WIDTH - 250, FRAME_HEIGHT - 40);
-
+        g.drawString(str,FRAME_WIDTH/2 -30,GameFrame.titleBarH+ MapTile.tileW);
     }
 
     //游戏运行状态的绘制
@@ -176,10 +234,36 @@ public class GameFrame extends Frame implements Runnable {
 
     }
 
+    private Image helpImg;
+    private Image aboutImg;
     private void drawAbout(Graphics g) {
+        g.setColor(Color.BLACK);
+        g.fillRect(0,0,FRAME_WIDTH,FRAME_HEIGHT);
+        if(aboutImg == null){
+            aboutImg = MyUtil.createImage("res/about.png");
+        }
+        int width = aboutImg.getWidth(null);
+        int height = aboutImg.getHeight(null);
+        int x = FRAME_WIDTH - width >>1;
+        int y = FRAME_HEIGHT - height>>1;
+        g.drawImage(aboutImg,x,y,null);
+        g.setColor(Color.WHITE);
+        g.drawString("任意键继续",10,FRAME_HEIGHT-10);
     }
 
     private void drawHelp(Graphics g) {
+        g.setColor(Color.BLACK);
+        g.fillRect(0,0,FRAME_WIDTH,FRAME_HEIGHT);
+        if(helpImg == null){
+            helpImg = MyUtil.createImage("res/help.png");
+        }
+        int width = helpImg.getWidth(null);
+        int height = helpImg.getHeight(null);
+        int x = FRAME_WIDTH - width >>1;
+        int y = FRAME_HEIGHT - height>>1;
+        g.drawImage(helpImg,x,y,null);
+        g.setColor(Color.WHITE);
+        g.drawString("任意键继续",10,FRAME_HEIGHT-10);
     }
 
     /**
@@ -206,6 +290,9 @@ public class GameFrame extends Frame implements Runnable {
             }
             g.drawString(MENUS[i], x, y + DIS * i);
         }
+    }
+    private void drawWin(Graphics g) {
+        drawLost(g,"游戏通关！");
     }
 
     /*
@@ -243,9 +330,13 @@ public class GameFrame extends Frame implements Runnable {
                     case STATE_RUN:
                         keyPressedEventRun(keyCode);
                         break;
-                    case STATE_OVER:
+                    case STATE_LOST:
                         keyPressedEventOver(keyCode);
                         break;
+                    case STATE_WIN:
+                        keyPressedEventWin(keyCode);
+                        break;
+
                 }
             }
 
@@ -261,6 +352,14 @@ public class GameFrame extends Frame implements Runnable {
                 }
             }
         });
+    }
+
+    /**
+     * 游戏通关的按键处理
+     * @param keyCode
+     */
+    private void keyPressedEventWin(int keyCode) {
+        keyPressedEventOver(keyCode);
     }
 
     /**
@@ -285,7 +384,6 @@ public class GameFrame extends Frame implements Runnable {
 
     //游戏结束状态的按键处理 TODO
     private void keyPressedEventOver(int keyCode) {
-
         if (keyCode == KeyEvent.VK_ESCAPE) {
             System.exit(0);
         } else if (keyCode == KeyEvent.VK_ENTER) {
@@ -298,6 +396,8 @@ public class GameFrame extends Frame implements Runnable {
 
     // 重置游戏状态
     private void resetGame() {
+        killEnemyCount = 0;
+
         menuIndex = 0;
         //先让自己坦克的子弹还回对象池
         myTank.bulletsReturn();
@@ -348,9 +448,11 @@ public class GameFrame extends Frame implements Runnable {
     }
 
     private void keyPressedEventAbout(int keyCode) {
+        setGameState(STATE_MENU);
     }
 
     private void keyPressedEventHelp(int keyCode) {
+        setGameState(STATE_MENU);
     }
 
     //菜单状态下按键的处理
@@ -373,29 +475,51 @@ public class GameFrame extends Frame implements Runnable {
                 repaint();//窗口重绘制
                 break;
             case KeyEvent.VK_ENTER:
-                //TODO
-                newGame();
+                switch (menuIndex){
+                    case 0:
+                        startGame(1);
+                        break;
+                    case 1:
+                        //选择关卡界面
+                        break;
+                    case 2:
+                        setGameState(STATE_HELP);
+                        break;
+                    case 3:
+                        setGameState(STATE_ABOUT);
+                        break;
+                    case 4:
+                        System.exit(0);
+                        break;
+                }
                 break;
         }
     }
 
     /**
      * 开始新游戏的方法
+     * 并加载关卡信息
      */
-    private void newGame() {
+    private static void startGame(int level) {
+        enemies.clear();
+        if(gameMap == null){
+            gameMap = new GameMap();
+        }
+        gameMap.initMap(level);
         MusicUtil.playStart();
+        killEnemyCount = 0;
         bornEnemyCount = 0;
-        gameMap = new GameMap();
+
         gameState = STATE_RUN;
         //创建坦克对象，敌人的坦克
-        myTank = new MyTank(FRAME_WIDTH/3, FRAME_HEIGHT-Tank.RADIUS, Tank.DIR_UP);
+        myTank = new MyTank(FRAME_WIDTH / 3, FRAME_HEIGHT - Tank.RADIUS, Tank.DIR_UP);
 
         //使用一个单独的线程用于生成敌人的坦克
         new Thread() {
             @Override
             public void run() {
                 while (true) {
-                    if (LevelInfo.getInstance().getEnemyCount()>bornEnemyCount&&
+                    if (LevelInfo.getInstance().getEnemyCount() > bornEnemyCount &&
                             enemies.size() < ENEMY_MAX_COUNT) {
                         Tank enemy = EnemyTank.createEnemy();
                         enemies.add(enemy);
@@ -442,26 +566,28 @@ public class GameFrame extends Frame implements Runnable {
             myTank.collideBullets(enemy.getBullets());
         }
     }
+
     //和地图块的碰撞
-    private void bulletAngTankCollideMapTile(){
+    private void bulletAngTankCollideMapTile() {
         myTank.bulletCollideMapTile(gameMap.getTiles());
 
         for (Tank enemy : enemies) {
             enemy.bulletCollideMapTile(gameMap.getTiles());
         }
         //玩家玩家坦克和地图的碰撞
-        if (myTank.isCollideTile(gameMap.getTiles())){
+        if (myTank.isCollideTile(gameMap.getTiles())) {
             myTank.back();
         }
         //敌人的坦克和敌人的碰撞
         for (Tank enemy : enemies) {
-            if(enemy.isCollideTile(gameMap.getTiles())){
+            if (enemy.isCollideTile(gameMap.getTiles())) {
                 enemy.back();
             }
         }
         //将所有不可见的地图块移除
         gameMap.clearDestroyedTile();
     }
+
     //所有坦克上的爆炸效果
     private void drawExplodes(Graphics g) {
         for (Tank enemy : enemies) {
@@ -469,12 +595,35 @@ public class GameFrame extends Frame implements Runnable {
         }
         myTank.drawExplodes(g);
     }
+
     //获得游戏状态
     public static void setGameState(int gameState) {
         GameFrame.gameState = gameState;
     }
+
     //修改游戏状态
     public static int getGameState() {
         return gameState;
+    }
+
+    /**
+     * 判断游戏是否最后一关
+     */
+    public static boolean isLastLevel() {
+        int currentLevel = LevelInfo.getInstance().getLevel();
+        int levelCount = GameInfo.getLevelCount();
+        return currentLevel == levelCount;
+
+        //resetGame();
+
+    }
+
+    /**
+     * 判断是否过关
+     *
+     * @return
+     */
+    public static boolean isCrossLevel() {
+        return killEnemyCount == LevelInfo.getInstance().getEnemyCount();
     }
 }

@@ -76,7 +76,10 @@ public class EnemyTank extends Tank{
         enemy.setDir(dir);
         enemy.setEnemy(true);
         enemy.setState(STATE_MOVE);
-        enemy.setHp(Tank.DEFAULT_HP);
+        //根据游戏难度设置敌人血量
+        int maxHp = Tank.DEFAULT_HP*LevelInfo.getInstance().getLevelType();
+        enemy.setHp(maxHp);
+        enemy.setMaxHp(maxHp);
         //通过关卡中信息中的敌人信息设置敌人类型
         int enemyType = LevelInfo.getInstance().getRandomEnemyType();
         enemy.setType(enemyType);

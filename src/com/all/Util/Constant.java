@@ -29,7 +29,9 @@ public class Constant {
     public static final int STATE_HELP = 1;
     public static final int STATE_ABOUT = 2;
     public static final int STATE_RUN = 3;
-    public static final int STATE_OVER = 4;
+    public static final int STATE_LOST = 4;
+    public static final int STATE_WIN = 5;
+    public static final int STATE_CROSS = 6;
 
     public static final String[] MENUS = {
             "开始游戏",
