@@ -1,9 +1,11 @@
 package com.all.Game;
 
 
+import com.all.Util.Constant;
 import com.all.Util.MusicUtil;
 import com.all.Util.MyUtil;
 import com.all.map.GameMap;
+import com.all.map.Gift;
 import com.all.map.MapTile;
 import com.all.tank.EnemyTank;
 import com.all.tank.MyTank;
@@ -207,6 +209,8 @@ import static com.all.Util.Constant.*;
         gameMap.drawBK(g);
         drawEnemy(g);
         myTank.draw(g);
+        gameMap.drawGift(g);
+
 
         //绘制地图的遮挡层
         gameMap.drawCover(g);
@@ -230,7 +234,7 @@ import static com.all.Util.Constant.*;
             }
             enemy.draw(g);
         }
-        System.out.println("敌人数量：" + enemies.size());
+        //System.out.println("敌人数量：" + enemies.size());
 
     }
 
@@ -538,6 +542,25 @@ import static com.all.Util.Constant.*;
                 }
             }
         }.start();
+
+        //使用另一個綫程產生礼物
+        new Thread() {
+//            Graphics g = Gift.star.getGraphics();
+            @Override
+            public void run() {
+                while (true) {
+                    gameMap.getGift().setVisible(true);
+                    try {
+                        Thread.sleep(10000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    if ( !gameMap.getGift().isVisible()) {
+                        break;
+                    }
+                }
+            }
+        }.start();
     }
 
     /**
@@ -574,7 +597,7 @@ import static com.all.Util.Constant.*;
         for (Tank enemy : enemies) {
             enemy.bulletCollideMapTile(gameMap.getTiles());
         }
-        //玩家玩家坦克和地图的碰撞
+        //玩家坦克和地图块的碰撞
         if (myTank.isCollideTile(gameMap.getTiles())) {
             myTank.back();
         }
@@ -584,8 +607,18 @@ import static com.all.Util.Constant.*;
                 enemy.back();
             }
         }
+        //玩家捡到强化材料
+        if(myTank.isCollideGift(gameMap.getGift())){
+            //玩家升级  TODO
+            playerUp();
+
+        }
         //将所有不可见的地图块移除
         gameMap.clearDestroyedTile();
+    }
+
+    private void playerUp() {
+        myTank.enhance();
     }
 
     //所有坦克上的爆炸效果

@@ -1,7 +1,6 @@
 package com.all.map;
 
 import com.all.Util.Constant;
-import com.all.Util.MyUtil;
 
 import java.awt.*;
 import java.util.ArrayList;

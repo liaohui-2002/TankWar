@@ -4,6 +4,7 @@ import com.all.Game.Bullet;
 import com.all.Game.Explode;
 import com.all.Game.GameFrame;
 import com.all.Util.*;
+import com.all.map.Gift;
 import com.all.map.MapTile;
 
 import java.awt.*;
@@ -344,7 +345,6 @@ public abstract class Tank {
 //                System.out.println("归还一颗子弹，子弹数目："+(BulletsPool.DEFAULT_POOL_SIZE-bullets.size()));
             }
         }
-//        System.out.println("坦克的子弹数量:"+bullets.size());
     }
 
     /**
@@ -450,6 +450,10 @@ public abstract class Tank {
                 i--;
             }
         }
+    }
+
+    public void enhance() {
+        this.setHp(this.hp*2);
     }
 
     //坦克血条
@@ -583,6 +587,68 @@ public abstract class Tank {
             if (collide) {
                 return true;
             }
+        }
+        return false;
+    }
+    public boolean isCollideGift(Gift gift){
+        if(gift == null){
+            gift = new Gift();
+        }
+        int giftX = gift.getX();
+        int giftY = gift.getY();
+        boolean collide = MyUtil.isCollide(x, y, RADIUS, giftX, giftY);
+        //碰上了就直接返回，否则判断下一个点
+        if (collide) {
+            return true;
+        }
+
+        //点2；
+        giftX += Gift.radius;
+        collide = MyUtil.isCollide(x, y, RADIUS, giftX, giftY);
+        if (collide) {
+            return true;
+        }
+
+        //点3 右上角点；
+        giftX += Gift.radius;
+        collide = MyUtil.isCollide(x, y, RADIUS, giftX, giftY);
+        if (collide) {
+            return true;
+        }
+
+        //点4 右中；
+//        tileX += MapTile.radius;
+        giftY += Gift.radius;
+        collide = MyUtil.isCollide(x, y, RADIUS, giftX, giftY);
+        if (collide) {
+            return true;
+        }
+
+        //点5 右下；
+        giftY += Gift.radius;
+        collide = MyUtil.isCollide(x, y, RADIUS, giftX, giftY);
+        if (collide) {
+            return true;
+        }
+
+        //点6 下中；
+        giftX -= Gift.radius;
+        collide = MyUtil.isCollide(x, y, RADIUS, giftX, giftY);
+        if (collide) {
+            return true;
+        }
+
+        //点7 左下；
+        giftX -= Gift.radius;
+        collide = MyUtil.isCollide(x, y, RADIUS, giftX, giftY);
+        if (collide) {
+            return true;
+        }
+        //点8  左中点；
+        giftY -= Gift.radius;
+        collide = MyUtil.isCollide(x, y, RADIUS, giftX, giftY);
+        if (collide) {
+            return true;
         }
         return false;
     }

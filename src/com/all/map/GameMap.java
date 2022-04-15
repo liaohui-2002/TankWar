@@ -4,6 +4,8 @@ import com.all.Game.GameFrame;
 import com.all.Game.LevelInfo;
 import com.all.Util.Constant;
 import com.all.Util.MapTilePool;
+import com.all.Util.MyUtil;
+
 import com.all.tank.Tank;
 
 import java.awt.*;
@@ -11,6 +13,8 @@ import java.io.FileInputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
+
+import static com.all.Util.Constant.*;
 
 /**
  * 游戏地图类
@@ -29,6 +33,16 @@ public class GameMap {
 
     //地图元素容器
     private List<MapTile> tiles = new ArrayList<>();
+    //Gift
+    static Gift gift = new Gift();
+
+    public Gift getGift() {
+        return gift;
+    }
+
+    public void setGift(Gift gift) {
+        this.gift = gift;
+    }
 
     //大本营
     private TankHouse house;
@@ -142,6 +156,10 @@ public class GameMap {
                 tile.draw(g);
             }
         }
+//        if(gift == null){
+//            gift = new Gift();
+//        }
+//        drawGift(g);
         house.draw(g);
     }
 
@@ -249,5 +267,29 @@ public class GameMap {
         for (int i = 0; i < rows; i++) {
             addRow(startX, endX, startY + i * (DIS + MapTile.tileW), type, DIS);
         }
+    }
+
+    public void drawGift(Graphics g){
+        new Thread() {
+            @Override
+            public void run() {
+                while (true) {
+
+                    try {
+                        gift.draw(g);
+                        Thread.sleep(3000);
+
+                        gift.setX(MyUtil.getRandomNumber(0,FRAME_WIDTH-Gift.giftW));
+                        gift.setY(MyUtil.getRandomNumber(0,FRAME_HEIGHT-Gift.giftW));
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    if ( !gift.isVisible()) {
+                        break;
+                    }
+                }
+            }
+        }.start();
+
     }
 }
