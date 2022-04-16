@@ -35,7 +35,7 @@ public abstract class Tank {
 
     //坦克的生命值
     public static final int DEFAULT_HP = 100;
-    private int maxHp = DEFAULT_HP;
+    public static int maxHp = DEFAULT_HP;
 
     private int x, y;
 
@@ -103,14 +103,6 @@ public abstract class Tank {
      * @param g
      */
     public abstract void drawImgTank(Graphics g);
-   /* {
-        if (isEnemy) {
-            g.drawImage(enemyImg[dir], x - RADIUS, y - RADIUS, null);
-        } else {
-            g.drawImage(tankImg[dir], x - RADIUS, y - RADIUS, null);
-        }
-    }*/
-
     /**
      * 使用系统方式绘制坦克
      *
@@ -415,7 +407,6 @@ public abstract class Tank {
 //                   GameFrame.nextLevel();
                 }
             }
-
         } else {
             delaySecondsToOver(1000);
             //game over
@@ -452,9 +443,13 @@ public abstract class Tank {
         }
     }
 
-    public void enhance() {
-        this.setHp(this.hp*2);
-    }
+    public abstract void enhance();
+
+  /*  public void enhance() {
+        this.hp = maxHp;
+        this.atk =  ATK_MAX;
+        this.speed = DEFAULT_SPEED*2;
+    }*/
 
     //坦克血条
     class BloodBar {

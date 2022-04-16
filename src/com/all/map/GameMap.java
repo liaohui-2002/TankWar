@@ -279,8 +279,8 @@ public class GameMap {
                         gift.draw(g);
                         Thread.sleep(3000);
 
-                        gift.setX(MyUtil.getRandomNumber(0,FRAME_WIDTH-Gift.giftW));
-                        gift.setY(MyUtil.getRandomNumber(0,FRAME_HEIGHT-Gift.giftW));
+                        /*gift.setX(MyUtil.getRandomNumber(0,FRAME_WIDTH-Gift.giftW));
+                        gift.setY(MyUtil.getRandomNumber(0,FRAME_HEIGHT-Gift.giftW));*/
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }

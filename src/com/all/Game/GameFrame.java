@@ -39,7 +39,7 @@ import static com.all.Util.Constant.*;
     //菜单指针
     private static int menuIndex;
     //定义坦克对象
-    private static Tank myTank;
+    private  static Tank myTank;
 
     //标题栏目的高度
     public static int titleBarH;
@@ -106,6 +106,7 @@ import static com.all.Util.Constant.*;
         //求出标题栏的高度
         titleBarH = getInsets().top;
         /*repaint();*/
+        initGame();
     }
 
 
@@ -210,14 +211,11 @@ import static com.all.Util.Constant.*;
         drawEnemy(g);
         myTank.draw(g);
         gameMap.drawGift(g);
-
-
         //绘制地图的遮挡层
         gameMap.drawCover(g);
         drawExplodes(g);
         //子弹和坦克的碰撞方法
         bulletCollideTank();
-
         //子弹和所有地图块的碰撞
         bulletAngTankCollideMapTile();
 
@@ -343,8 +341,6 @@ import static com.all.Util.Constant.*;
 
                 }
             }
-
-
             //按键松开的时候回调的内容
             @Override
             public void keyReleased(KeyEvent e) {
@@ -401,7 +397,6 @@ import static com.all.Util.Constant.*;
     // 重置游戏状态
     private void resetGame() {
         killEnemyCount = 0;
-
         menuIndex = 0;
         //先让自己坦克的子弹还回对象池
         myTank.bulletsReturn();
@@ -413,7 +408,6 @@ import static com.all.Util.Constant.*;
         //清空敌人
         enemies.clear();
         //清空地图资源
-
         gameMap = null;
     }
 
@@ -505,6 +499,8 @@ import static com.all.Util.Constant.*;
      * 并加载关卡信息
      */
     private static void startGame(int level) {
+        //创建玩家坦克
+        myTank = new MyTank(FRAME_WIDTH / 3, FRAME_HEIGHT - Tank.RADIUS, Tank.DIR_UP);
         enemies.clear();
         if(gameMap == null){
             gameMap = new GameMap();
@@ -513,11 +509,7 @@ import static com.all.Util.Constant.*;
         MusicUtil.playStart();
         killEnemyCount = 0;
         bornEnemyCount = 0;
-
         gameState = STATE_RUN;
-        //创建坦克对象，敌人的坦克
-        myTank = new MyTank(FRAME_WIDTH / 3, FRAME_HEIGHT - Tank.RADIUS, Tank.DIR_UP);
-
         //使用一个单独的线程用于生成敌人的坦克
         new Thread() {
             @Override
@@ -528,7 +520,6 @@ import static com.all.Util.Constant.*;
                         Tank enemy = EnemyTank.createEnemy();
                         enemies.add(enemy);
                         bornEnemyCount++;
-
                     }
                     try {
                         Thread.sleep(ENEMY_BORN_INTERVAL);
@@ -592,6 +583,7 @@ import static com.all.Util.Constant.*;
 
     //和地图块的碰撞
     private void bulletAngTankCollideMapTile() {
+        //玩家子弹碰撞地图块
         myTank.bulletCollideMapTile(gameMap.getTiles());
 
         for (Tank enemy : enemies) {
@@ -601,7 +593,7 @@ import static com.all.Util.Constant.*;
         if (myTank.isCollideTile(gameMap.getTiles())) {
             myTank.back();
         }
-        //敌人的坦克和敌人的碰撞
+        //敌人的坦克和地图块的碰撞
         for (Tank enemy : enemies) {
             if (enemy.isCollideTile(gameMap.getTiles())) {
                 enemy.back();
@@ -611,7 +603,8 @@ import static com.all.Util.Constant.*;
         if(myTank.isCollideGift(gameMap.getGift())){
             //玩家升级  TODO
             playerUp();
-
+            // 礼物消失回收
+            gameMap.getGift().setVisible(false);
         }
         //将所有不可见的地图块移除
         gameMap.clearDestroyedTile();
@@ -628,7 +621,6 @@ import static com.all.Util.Constant.*;
         }
         myTank.drawExplodes(g);
     }
-
     //获得游戏状态
     public static void setGameState(int gameState) {
         GameFrame.gameState = gameState;

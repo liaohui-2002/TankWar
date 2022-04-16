@@ -52,9 +52,13 @@ public class EnemyTank extends Tank{
     @Override
     public void drawImgTank(Graphics g) {
         AI();
-
         g.drawImage(type == TYPE_NORMAL ? normalEnemyImg[getDir()]:
                 greenEnemyImg[getDir()],getX() - RADIUS, getY() - RADIUS, null);
+    }
+
+    @Override
+    public void enhance() {
+
     }
 
     public int getType() {

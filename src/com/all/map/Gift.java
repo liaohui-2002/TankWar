@@ -64,7 +64,7 @@ public class Gift {
         if(giftW<=0){
             giftW = star.getWidth(null);
         }
-        System.out.println("调用了一次礼物绘画");
+        //System.out.println("调用了一次礼物绘画");
         g.drawImage(star,x,y,null);
     }
 }
