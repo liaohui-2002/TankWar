@@ -32,12 +32,17 @@ public class Constant {
     public static final int STATE_LOST = 4;
     public static final int STATE_WIN = 5;
     public static final int STATE_CROSS = 6;
+    public static final int STATE_PAUSE = 7;
 
     public static final String[] MENUS = {
-            "开始游戏",
-            "继续游戏",
+            "新的游戏",
             "游戏帮助",
             "关于游戏",
+            "退出游戏",
+    };
+    public static final String[] PAUSE_MENU = {
+            "新的游戏",
+            "继续游戏",
             "退出游戏",
     };
     public static final String OVER_STR0 = "ESC键退出游戏";

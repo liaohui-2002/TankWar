@@ -103,6 +103,7 @@ public abstract class Tank {
      * @param g
      */
     public abstract void drawImgTank(Graphics g);
+
     /**
      * 使用系统方式绘制坦克
      *
@@ -301,7 +302,7 @@ public abstract class Tank {
             Bullet bullet = BulletsPool.get();
             bullet.setAtk(atk);
             bullet.setDir(dir);
-
+            bullet.setSpeed(speed<<1);
             bullet.setX(bulletX);
             bullet.setY(bulletY);
             bullet.setColor(color);
@@ -382,18 +383,19 @@ public abstract class Tank {
     private void hurt(Bullet bullet) {
         int atk = bullet.getAtk();
         hp -= atk;
-        if (hp < 0) {
+        if (hp <= 0) {
             hp = 0;
             die();
         }
     }
 
 
-    //坦克死亡 TODO
+    //坦克死亡
     private void die() {
         if (isEnemy) {
             GameFrame.killEnemyCount++;
             //敌人坦克被消灭 还回对象池
+            System.out.println("坦克死亡");
             EnemyTanksPool.theReturn(this);
             //判断是否通过本关
             if (GameFrame.isCrossLevel()) {
@@ -585,8 +587,9 @@ public abstract class Tank {
         }
         return false;
     }
-    public boolean isCollideGift(Gift gift){
-        if(gift == null){
+
+    public boolean isCollideGift(Gift gift) {
+        if (gift == null) {
             gift = new Gift();
         }
         int giftX = gift.getX();

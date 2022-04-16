@@ -45,6 +45,7 @@ public class MyTank extends Tank{
     public MyTank(int x, int y, int dir) {
         super(x, y, dir);
         this.level= TANK_LOW;
+        this.setColor(Color.YELLOW);
     }
 
     @Override
@@ -62,5 +63,6 @@ public class MyTank extends Tank{
         this.setHp(maxHp);
         this.setAtk(ATK_MAX*2);
         this.setSpeed(DEFAULT_SPEED*2);
+
     }
 }

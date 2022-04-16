@@ -10,6 +10,7 @@ import com.all.map.MapTile;
 import com.all.tank.EnemyTank;
 import com.all.tank.MyTank;
 import com.all.tank.Tank;
+import com.sun.org.apache.bcel.internal.generic.BREAKPOINT;
 
 import java.awt.*;
 import java.awt.event.KeyAdapter;
@@ -38,6 +39,8 @@ import static com.all.Util.Constant.*;
 
     //菜单指针
     private static int menuIndex;
+    //暂停指针
+    private static int pauseIndex;
     //定义坦克对象
     private  static Tank myTank;
 
@@ -143,10 +146,34 @@ import static com.all.Util.Constant.*;
             case STATE_CROSS:
                 drawCross(g);
                 break;
+            case STATE_PAUSE:
+                drawPause(g);
+                break;
         }
 
         //使用系统画笔将图片绘制到FRAME上面
         g1.drawImage(bufImg, 0, 0, null);
+    }
+
+    private void drawPause(Graphics g) {
+        //绘制黑色背景
+        g.setColor(Color.BLACK);
+        g.fillRect(0, 0, FRAME_WIDTH, FRAME_HEIGHT);
+
+        final int STR_WIDTH = 76;
+        int x = FRAME_WIDTH - STR_WIDTH >> 1;
+        int y = FRAME_HEIGHT / 3;
+        final int DIS = 50;//行间距
+        g.setColor(Color.WHITE);
+        for (int i = 0; i < PAUSE_MENU.length; i++) {
+            if (i == pauseIndex) {//将选中的菜单项颜色设置为红色
+                g.setColor(Color.RED);
+            } else {
+                //其他的为白色
+                g.setColor(Color.WHITE);
+            }
+            g.drawString(PAUSE_MENU[i], x, y + DIS * i);
+        }
     }
 
     /**
@@ -250,6 +277,9 @@ import static com.all.Util.Constant.*;
         int y = FRAME_HEIGHT - height>>1;
         g.drawImage(aboutImg,x,y,null);
         g.setColor(Color.WHITE);
+        g.drawString("version:1.0",FRAME_WIDTH/2-100,FRAME_HEIGHT/2-20);
+        g.drawString("developer:sir_lh",FRAME_WIDTH/2-100,FRAME_HEIGHT/2);
+        g.drawString("address:123.@163.com",FRAME_WIDTH/2-100,FRAME_HEIGHT/2+20);
         g.drawString("任意键继续",10,FRAME_HEIGHT-10);
     }
 
@@ -265,6 +295,10 @@ import static com.all.Util.Constant.*;
         int y = FRAME_HEIGHT - height>>1;
         g.drawImage(helpImg,x,y,null);
         g.setColor(Color.WHITE);
+//        g.drawString("移动:",FRAME_WIDTH/2-20,FRAME_HEIGHT/2-50);
+        g.drawString("W,S,A,D和方向键均可控制移动",FRAME_WIDTH/2-150,FRAME_HEIGHT/2-30);
+        g.drawString("空格键开火",FRAME_WIDTH/2-150,FRAME_HEIGHT/2);
+        g.drawString("游戏中可按‘ESC’键暂停进入菜单",FRAME_WIDTH/2-150,FRAME_HEIGHT/2+30);
         g.drawString("任意键继续",10,FRAME_HEIGHT-10);
     }
 
@@ -338,6 +372,9 @@ import static com.all.Util.Constant.*;
                     case STATE_WIN:
                         keyPressedEventWin(keyCode);
                         break;
+                    case STATE_PAUSE:
+                        keyPressedEventPause(keyCode);
+                        break;
 
                 }
             }
@@ -398,6 +435,7 @@ import static com.all.Util.Constant.*;
     private void resetGame() {
         killEnemyCount = 0;
         menuIndex = 0;
+        pauseIndex = 0;
         //先让自己坦克的子弹还回对象池
         myTank.bulletsReturn();
         //销毁坦克
@@ -442,6 +480,9 @@ import static com.all.Util.Constant.*;
             case KeyEvent.VK_SPACE:
                 myTank.fire();
                 break;
+            case KeyEvent.VK_ESCAPE:
+                setGameState(STATE_PAUSE);
+                break;
         }
     }
 
@@ -453,6 +494,43 @@ import static com.all.Util.Constant.*;
         setGameState(STATE_MENU);
     }
 
+    /**
+     * 暂停状态下菜单按键处理
+     * @param keyCode
+     */
+    private void keyPressedEventPause(int keyCode){
+        switch (keyCode) {
+            case KeyEvent.VK_UP:
+            case KeyEvent.VK_W:
+
+                if (--pauseIndex < 0) {
+                    pauseIndex= PAUSE_MENU.length - 1;
+                }
+                repaint();
+                break;
+            case KeyEvent.VK_DOWN:
+            case KeyEvent.VK_S:
+
+                if (++pauseIndex > PAUSE_MENU.length - 1) {
+                    pauseIndex = 0;
+                }
+                repaint();//窗口重绘制
+                break;
+            case KeyEvent.VK_ENTER:
+                switch (pauseIndex){
+                    case 0:
+                        startGame(1);
+                        break;
+                    case 1:
+                        setGameState(STATE_RUN);
+                        break;
+                    case 2:
+                        System.exit(0);
+                        break;
+                }
+                break;
+        }
+    }
     //菜单状态下按键的处理
     private void keyPressedEventMenu(int keyCode) {
         switch (keyCode) {
@@ -478,7 +556,7 @@ import static com.all.Util.Constant.*;
                         startGame(1);
                         break;
                     case 1:
-                        //选择关卡界面
+                        setGameState(STATE_RUN);
                         break;
                     case 2:
                         setGameState(STATE_HELP);
@@ -649,6 +727,7 @@ import static com.all.Util.Constant.*;
      * @return
      */
     public static boolean isCrossLevel() {
+        System.out.println("判断了一次是否过关");
         return killEnemyCount == LevelInfo.getInstance().getEnemyCount();
     }
 }

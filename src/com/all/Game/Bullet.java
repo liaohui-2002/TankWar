@@ -11,7 +11,7 @@ import java.awt.*;
  */
 public class Bullet {
     //默认速度 为坦克2倍
-    public static final int DEFAULT_SPEED = Tank.DEFAULT_SPEED << 1;
+    public static final int DEFAULT_SPEED = Tank.DEFAULT_SPEED <<1;
 
     //
     public static final int RADIUS = 4;
