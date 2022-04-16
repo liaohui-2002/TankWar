@@ -1,5 +1,6 @@
 package com.all.tank;
 
+import com.all.Util.MusicUtil;
 import com.all.Util.MyUtil;
 
 import java.awt.*;
@@ -63,6 +64,6 @@ public class MyTank extends Tank{
         this.setHp(maxHp);
         this.setAtk(ATK_MAX*2);
         this.setSpeed(DEFAULT_SPEED*2);
-
+        MusicUtil.playAdd();
     }
 }
