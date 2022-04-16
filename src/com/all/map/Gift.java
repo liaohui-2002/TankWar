@@ -1,11 +1,7 @@
 package com.all.map;
-
 import com.all.Util.Constant;
 import com.all.Util.MyUtil;
-
 import java.awt.*;
-import java.awt.image.BufferedImage;
-
 /**
  * @auther Mr.Liao
  * @date 2022/4/11 18:08

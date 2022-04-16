@@ -234,6 +234,7 @@ import static com.all.Util.Constant.*;
         g.setColor(Color.BLACK);
         g.fillRect(0, 0, FRAME_WIDTH, FRAME_HEIGHT);
         //绘制地图的碰撞层
+
         gameMap.drawBK(g);
         drawEnemy(g);
         myTank.draw(g);
@@ -556,15 +557,12 @@ import static com.all.Util.Constant.*;
                         startGame(1);
                         break;
                     case 1:
-                        setGameState(STATE_RUN);
-                        break;
-                    case 2:
                         setGameState(STATE_HELP);
                         break;
-                    case 3:
+                    case 2:
                         setGameState(STATE_ABOUT);
                         break;
-                    case 4:
+                    case 3:
                         System.exit(0);
                         break;
                 }
