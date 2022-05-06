@@ -10,7 +10,7 @@ import com.all.map.MapTile;
 import com.all.tank.EnemyTank;
 import com.all.tank.MyTank;
 import com.all.tank.Tank;
-import com.sun.org.apache.bcel.internal.generic.BREAKPOINT;
+
 
 import java.awt.*;
 import java.awt.event.KeyAdapter;
@@ -73,7 +73,6 @@ import static com.all.Util.Constant.*;
      */
     public GameFrame() throws HeadlessException {
         initFrame();
-
         initEventListener();
         //启动用于刷新窗口的线程
         new Thread(this).start();
@@ -150,7 +149,6 @@ import static com.all.Util.Constant.*;
                 drawPause(g);
                 break;
         }
-
         //使用系统画笔将图片绘制到FRAME上面
         g1.drawImage(bufImg, 0, 0, null);
     }
@@ -420,7 +418,7 @@ import static com.all.Util.Constant.*;
         }
     }
 
-    //游戏结束状态的按键处理 TODO
+    //游戏结束状态的按键处理
     private void keyPressedEventOver(int keyCode) {
         if (keyCode == KeyEvent.VK_ESCAPE) {
             System.exit(0);

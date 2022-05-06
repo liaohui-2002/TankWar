@@ -5,7 +5,7 @@ enemyCount=10
 enemyType=0,1
 #用哪个方法
 method=addRow
-//该方法调用几次
+#该方法调用几次
 invokeCount=5
 #关卡难度
 levelType=1

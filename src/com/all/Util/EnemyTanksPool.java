@@ -14,7 +14,7 @@ import java.util.List;
 public class EnemyTanksPool {
     public static final int DEFAULT_POOL_SIZE = 20;
     public static final int POOL_MAX_SIZE = 20;
-    //保存所有子弹的容器
+
     private static List<Tank> pool = new ArrayList<>();
 
     static {

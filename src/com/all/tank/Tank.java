@@ -111,7 +111,6 @@ public abstract class Tank {
      */
     private void drawTank(Graphics g) {
         g.setColor(color);
-
         //绘制坦克的圆形
         g.fillOval(x - RADIUS, y - RADIUS, RADIUS << 1, RADIUS << 1);
         int endX = x, endY = y;
@@ -306,7 +305,6 @@ public abstract class Tank {
             bullet.setX(bulletX);
             bullet.setY(bulletY);
             bullet.setColor(color);
-
             bullet.setVisible(true);
 //        Bullet bullet = new Bullet(bulletX, bulletY, dir, atk, color);
             bullets.add(bullet);
@@ -335,7 +333,6 @@ public abstract class Tank {
                 //还原到对象池中
                 BulletsPool.theReturn(remove);
                 i--;
-//                System.out.println("归还一颗子弹，子弹数目："+(BulletsPool.DEFAULT_POOL_SIZE-bullets.size()));
             }
         }
     }
@@ -395,7 +392,6 @@ public abstract class Tank {
         if (isEnemy) {
             GameFrame.killEnemyCount++;
             //敌人坦克被消灭 还回对象池
-            System.out.println("坦克死亡");
             EnemyTanksPool.theReturn(this);
             //判断是否通过本关
             if (GameFrame.isCrossLevel()) {
@@ -404,16 +400,13 @@ public abstract class Tank {
                     //通关
                     GameFrame.setGameState(Constant.STATE_WIN);
                 } else {
-                    //TODO 进入下一关
+                    // 进入下一关
                     GameFrame.startCrossLevel();
-//                   GameFrame.nextLevel();
                 }
             }
         } else {
             delaySecondsToOver(1000);
-            //game over
             GameFrame.setGameState(Constant.STATE_LOST);
-
         }
     }
 

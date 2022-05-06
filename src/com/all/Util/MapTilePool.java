@@ -25,13 +25,12 @@ public class MapTilePool {
      */
     public static MapTile get(){
         MapTile mapTile = null;
-        if(pool.size() == 0) {//池塘被掏空
+        if(pool.size() == 0) {
             mapTile  = new MapTile();
         }
         else {
             mapTile = pool.remove(0);
         }
-//        System.out.println("从对象池中获取了一个对象，剩余："+pool.size());
         return mapTile;
     }
 
@@ -40,7 +39,6 @@ public class MapTilePool {
             return;
         }else {
             pool.add(mapTile);
-//            System.out.println("对象池中归还了一颗子弹，当前池中子弹数目："+pool.size());
         }
     }
 }

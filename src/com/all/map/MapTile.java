@@ -36,15 +36,6 @@ public class MapTile {
         }
     }
 
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-
     //xy分别是图片资源左上角的坐标
     private int x,y;
     private boolean visible = true;

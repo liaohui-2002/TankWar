@@ -16,8 +16,6 @@ public class ExplodesPool {
     public static final int POOL_MAX_SIZE = 20;
     //保存所有子弹的容器
     private static List<Explode> pool = new ArrayList<>();
-
-    //在类加载的时候创建200个子弹添加到容器中
     static {
         for (int i = 0; i < DEFAULT_POOL_SIZE; i++) {
             pool.add(new Explode());
@@ -36,7 +34,6 @@ public class ExplodesPool {
         else {
             explode = pool.remove(0);
         }
-//        System.out.println("从对象池中获取了一个对象，剩余："+pool.size());
         return explode;
     }
 

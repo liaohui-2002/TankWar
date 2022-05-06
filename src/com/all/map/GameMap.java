@@ -68,7 +68,6 @@ public class GameMap {
         } catch (Exception e) {
             e.printStackTrace();
         }
-
         //初始化大本营
         house = new TankHouse();
         addHouse();
@@ -156,10 +155,6 @@ public class GameMap {
                 tile.draw(g);
             }
         }
-//        if(gift == null){
-//            gift = new Gift();
-//        }
-//        drawGift(g);
         house.draw(g);
     }
 
@@ -177,25 +172,7 @@ public class GameMap {
         house.draw(g);
     }
 
-    /**
-     * 判断某一个点确定的块是否和容器中所有的方块位置有重叠
-     *
-     * @param tiles
-     * @param x
-     * @param y
-     * @return 有重叠返回true 没有重叠返回false
-     */
-    private boolean isCollide(List<MapTile> tiles, int x, int y) {
-        for (MapTile tile : tiles) {
-            int tileX = tile.getX();
-            int tileY = tile.getY();
-            if (Math.abs(tileX - x) < MapTile.tileW && Math.abs(tileY - y) < MapTile.tileW) {
-                return true;
-            }
 
-        }
-        return false;
-    }
 
     /**
      * 将所有不可见的块回收

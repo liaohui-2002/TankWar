@@ -15,7 +15,6 @@ public class BulletsPool {
     public static final int POOL_MAX_SIZE = 300;
     //保存所有子弹的容器
     private static List<Bullet> pool = new ArrayList<>();
-
     //在类加载的时候创建200个子弹添加到容器中
     static {
         for (int i = 0; i < DEFAULT_POOL_SIZE; i++) {
@@ -35,7 +34,6 @@ public class BulletsPool {
         else {//池塘中还有子弹就拿走第一颗
             bullet = pool.remove(0);
         }
-//        System.out.println("从对象池中获取了一个对象，剩余："+pool.size());
         return bullet;
     }
 
@@ -45,7 +43,6 @@ public class BulletsPool {
             return;
         }else {
             pool.add(bullet);
-//            System.out.println("对象池中归还了一颗子弹，当前池中子弹数目："+pool.size());
         }
     }
 }
