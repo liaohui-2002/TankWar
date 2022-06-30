@@ -14,7 +14,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
-import static com.all.Util.Constant.*;
 
 /**
  * 游戏地图类

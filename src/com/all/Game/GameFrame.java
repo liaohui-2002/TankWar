@@ -206,7 +206,6 @@ import static com.all.Util.Constant.*;
     }
     /**
      * 绘制游戏结束的画面
-     *
      * @param g
      */
     private void drawLost(Graphics g,String str) {
@@ -218,7 +217,6 @@ import static com.all.Util.Constant.*;
         int height = overImg.getHeight(null);
 
         g.drawImage(overImg, FRAME_WIDTH - width >> 1, FRAME_HEIGHT - height >> 1, null);
-
         //添加键位提示信息
         g.setColor(Color.RED);
         g.drawString(OVER_STR0, 30, FRAME_HEIGHT - 40);
@@ -232,7 +230,6 @@ import static com.all.Util.Constant.*;
         g.setColor(Color.BLACK);
         g.fillRect(0, 0, FRAME_WIDTH, FRAME_HEIGHT);
         //绘制地图的碰撞层
-
         gameMap.drawBK(g);
         drawEnemy(g);
         myTank.draw(g);
@@ -258,7 +255,6 @@ import static com.all.Util.Constant.*;
             }
             enemy.draw(g);
         }
-        //System.out.println("敌人数量：" + enemies.size());
 
     }
 
@@ -303,7 +299,6 @@ import static com.all.Util.Constant.*;
 
     /**
      * 绘制菜单状态下内容
-     *
      * @param g 画笔对象，由系统提供
      */
     private void drawMenu(Graphics g) {
@@ -712,9 +707,7 @@ import static com.all.Util.Constant.*;
         int currentLevel = LevelInfo.getInstance().getLevel();
         int levelCount = GameInfo.getLevelCount();
         return currentLevel == levelCount;
-
         //resetGame();
-
     }
 
     /**
